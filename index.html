@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeXcelerater_AI | Intelligence Layer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --bg-deep: #020617;
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --sky-accent: #38bdf8;
+            --indigo-accent: #818cf8;
+            --purple-accent: #c084fc;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-deep); 
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism & Borders */
+        .glass-card { 
+            background: var(--card-bg); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 1.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .gradient-text { 
+            background: linear-gradient(135deg, var(--sky-accent), var(--indigo-accent), var(--purple-accent)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .premium-border { position: relative; }
+        .premium-border::after { 
+            content: ''; position: absolute; inset: -1px; 
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(192, 132, 252, 0.3)); 
+            border-radius: 1.5rem; z-index: -1; 
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .animate-fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .animate-slide-in-left { animation: slideInLeft 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        .progress-bar { transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.3); }
+
+        /* Error Popup */
+        #errorPopup { 
+            transform: translateY(100px); 
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+            opacity: 0; 
+            pointer-events: none; 
+        }
+        #errorPopup.show { transform: translateY(0); opacity: 1; pointer-events: all; }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen selection:bg-sky-500/30">
+    <!-- Error Popup -->
+    <div id="errorPopup" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-4">
+        <div class="glass-card p-4 bg-rose-500/10 border-rose-500/20 flex items-start space-x-4 shadow-2xl">
+            <div class="w-10 h-10 bg-rose-500/20 rounded-xl flex-shrink-0 flex items-center justify-center text-rose-500">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="flex-grow pt-1">
+                <h5 class="text-sm font-bold text-rose-400 mb-1">Intelligence Engine Alert</h5>
+                <p id="errorText" class="text-xs text-slate-400 leading-relaxed"></p>
+            </div>
+            <button onclick="hideError()" class="text-slate-500 hover:text-white transition pt-1">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="p-6 border-b border-white/5 sticky top-0 bg-slate-950/20 backdrop-blur-xl z-50 animate-fade-in-up">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 group cursor-pointer">
+                <div class="w-10 h-10 bg-gradient-to-tr from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20 group-hover:scale-110 transition duration-300">
+                    <i class="fas fa-brain text-white text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight">Resume<span class="gradient-text">Xcelerater</span></h1>
+            </div>
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                <span class="px-4 py-1.5 bg-sky-500/10 text-sky-400 rounded-full border border-sky-500/20 text-[10px] font-black uppercase tracking-tighter">Engine Active</span>
+                <span class="px-4 py-1.5 bg-purple-500/10 text-purple-400 rounded-full border border-purple-500/20 text-[10px] font-black uppercase tracking-tighter">Role Intelligence v3.0</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6 pt-4">
+        <!-- Product Context & Features -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 animate-fade-in-up">
+            <div class="glass-card p-4 flex items-center space-x-4 border-l-4 border-sky-500">
+                <div class="w-10 h-10 rounded-full bg-sky-500/10 flex items-center justify-center text-sky-400">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-tighter">Deterministic Engine</h4>
+                    <p class="text-[10px] text-slate-500 leading-tight">Hybrid AI analysis with zero-hallucination scoring.</p>
+                </div>
+            </div>
+            <div class="glass-card p-4 flex items-center space-x-4 border-l-4 border-purple-500">
+                <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-tighter">Live Market Sync</h4>
+                    <p class="text-[10px] text-slate-500 leading-tight">Real-time Adzuna job matching & salary insights.</p>
+                </div>
+            </div>
+            <div class="glass-card p-4 flex items-center space-x-4 border-l-4 border-emerald-500">
+                <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                    <i class="fas fa-route"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-tighter">Strategic Roadmaps</h4>
+                    <p class="text-[10px] text-slate-500 leading-tight">Tactical 12-month growth plans per role.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Analysis Section -->
+        <div id="heroSection" class="max-w-4xl mx-auto mb-8 animate-fade-in-up stagger-1">
+            <div class="glass-card p-8 premium-border shadow-2xl overflow-hidden">
+                <div class="flex items-center justify-center mb-8">
+                    <div class="w-10 h-10 bg-sky-500/10 rounded-xl flex items-center justify-center text-sky-400 mr-3 border border-sky-500/20">
+                        <i class="fas fa-file-invoice text-lg"></i>
+                    </div>
+                    <h3 class="text-xl font-black tracking-tight">Resume Analyser</h3>
+                </div>
+
+                <form id="analyzeForm" class="space-y-8">
+                    <div class="group">
+                        <label class="block text-sm font-black uppercase tracking-[0.2em] text-slate-300 mb-4 group-focus-within:text-sky-400 transition text-center">Define Target Role</label>
+                        <div class="relative max-w-xl mx-auto">
+                            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-600 text-lg"></i>
+                            <input type="text" name="target_role" placeholder="e.g. Senior Backend Engineer" required
+                                class="w-full bg-slate-900/80 border border-white/10 rounded-2xl p-5 pl-16 focus:ring-4 focus:ring-sky-500/20 outline-none transition text-lg font-bold placeholder:text-slate-700 shadow-inner">
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label class="block text-sm font-black uppercase tracking-[0.2em] text-slate-300 mb-4 group-focus-within:text-sky-400 transition text-center">Curated Resume (PDF)</label>
+                        <div class="relative border-2 border-dashed border-white/10 rounded-3xl p-10 text-center hover:border-sky-500/50 transition-all cursor-pointer group/file max-w-xl mx-auto bg-slate-950/50 hover:bg-sky-500/5 shadow-inner">
+                            <input type="file" name="resume_file" id="resume_file" accept=".pdf" required
+                                class="absolute inset-0 opacity-0 cursor-pointer">
+                            <div id="fileIcon" class="mb-4 transform group-hover/file:scale-110 transition-transform duration-500">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-slate-800 group-hover/file:text-sky-400"></i>
+                            </div>
+                            <p id="fileStatus" class="text-xs text-slate-400 group-hover/file:text-slate-200 font-bold uppercase tracking-widest">Drop Resume or <span class="text-sky-400">Browse</span></p>
+                        </div>
+                    </div>
+
+                    <div class="max-w-xl mx-auto">
+                        <button type="submit" id="submitBtn"
+                            class="w-full bg-gradient-to-r from-sky-500 via-indigo-600 to-purple-600 hover:shadow-[0_0_40px_rgba(56,189,248,0.4)] text-white font-black py-5 rounded-2xl transition transform active:scale-[0.98] flex justify-center items-center group text-base tracking-tight">
+                            <span>Execute Intelligence Scan</span>
+                            <i id="spinner" class="fas fa-circle-notch fa-spin hidden ml-4"></i>
+                            <i class="fas fa-bolt ml-4 group-hover:rotate-12 transition-transform block spinner-hide"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Analysis Results (Hidden by default) -->
+        <div id="results" class="hidden space-y-12 animate-fade-in-up">
+            
+            <!-- KPI Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-8 border-t-4 border-sky-500 shadow-sky-500/5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Deterministic Match</p>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-5xl font-black text-white" id="matchScore">0%</span>
+                        <span class="text-[10px] font-bold text-sky-400 tracking-tighter">MARKET SYNC</span>
+                    </div>
+                    <div class="mt-6 w-full bg-slate-800/50 rounded-full h-1.5 overflow-hidden">
+                        <div id="matchBar" class="progress-bar bg-sky-500 h-full" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="glass-card p-8 border-t-4 border-purple-500 shadow-purple-500/5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Confidence Index</p>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-5xl font-black text-white" id="confScore">0.0</span>
+                        <span class="text-[10px] font-bold text-purple-400 uppercase">Profile v<span id="profileVersion">1</span></span>
+                    </div>
+                    <div class="mt-6 flex items-center text-[9px] text-slate-500 font-bold uppercase tracking-widest">
+                        <i class="fas fa-shield-alt mr-2 text-purple-500"></i> Immutable Record
+                    </div>
+                </div>
+                <div class="glass-card p-8 border-t-4 border-emerald-500 shadow-emerald-500/5">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Readiness Score</p>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-5xl font-black text-white" id="readinessScore">0%</span>
+                        <span class="text-[10px] font-bold text-emerald-400">VERIFIED</span>
+                    </div>
+                    <div class="mt-6 flex items-center text-[9px] text-slate-500 font-bold uppercase tracking-widest">
+                        <i class="fas fa-check-circle mr-2 text-emerald-500"></i> Market Sync Complete
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skill Breakdown -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="glass-card p-8">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-8 flex items-center">
+                        <i class="fas fa-check-double mr-3 text-sky-400"></i> Extracted Expertise
+                    </h4>
+                    <div id="matchedSkills" class="flex flex-wrap gap-3"></div>
+                </div>
+                <div class="glass-card p-8">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-8 flex items-center">
+                        <i class="fas fa-search-minus mr-3 text-rose-400"></i> Competency Gaps
+                    </h4>
+                    <div id="missingSkills" class="flex flex-wrap gap-3"></div>
+                </div>
+            </div>
+
+            <!-- Career Coach Dashboard (Synthesis Layer) -->
+            <div id="coachDashboard" class="glass-card overflow-hidden border-t-4 border-indigo-500">
+                <div class="p-8 bg-gradient-to-br from-slate-900 to-transparent">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-10">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-14 h-14 bg-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                                <i class="fas fa-user-tie text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-black">Career Intelligence Summary</h4>
+                                <p class="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">Executive Assessment</p>
+                            </div>
+                        </div>
+                        <div class="text-center md:text-right bg-emerald-500/5 px-6 py-4 rounded-2xl border border-emerald-500/10">
+                            <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Estimated Market Value (India)</p>
+                            <p id="salaryInsight" class="text-2xl font-black text-emerald-400 tracking-tight">---</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-950/40 p-8 rounded-3xl border border-white/5 mb-10 shadow-inner">
+                        <p id="executiveSummary" class="text-base text-slate-300 leading-relaxed font-light italic"></p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="space-y-6">
+                            <h5 class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center">
+                                <i class="fas fa-star mr-3 text-amber-400"></i> Top Strategic Roles
+                            </h5>
+                            <div id="topRoles" class="flex flex-wrap gap-3"></div>
+                        </div>
+                        <div class="space-y-6">
+                            <h5 class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center">
+                                <i class="fas fa-graduation-cap mr-3 text-indigo-400"></i> Mastery Checklist
+                            </h5>
+                            <ul id="growthRoadmap" class="space-y-4"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roadmap & Jobs (Tabs) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Strategic Roadmap -->
+                <div class="glass-card p-8">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-8 flex items-center">
+                        <i class="fas fa-route mr-3 text-sky-400"></i> Growth Trajectory
+                    </h4>
+                    <div class="space-y-8">
+                        <div class="relative pl-8 border-l-2 border-sky-500/20">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-sky-500 shadow-lg shadow-sky-500/50"></div>
+                            <h5 class="text-[10px] font-black text-sky-400 uppercase tracking-widest mb-4">Phase 1: Tactical (1-3M)</h5>
+                            <ul id="shortTerm" class="space-y-3 text-sm text-slate-400 font-light"></ul>
+                        </div>
+                        <div class="relative pl-8 border-l-2 border-purple-500/20">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-500 shadow-lg shadow-purple-500/50"></div>
+                            <h5 class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-4">Phase 2: Strategic (6-12M)</h5>
+                            <ul id="longTerm" class="space-y-3 text-sm text-slate-400 font-light"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Market Jobs -->
+                <div class="glass-card p-8">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-8 flex items-center">
+                        <i class="fas fa-broadcast-tower mr-3 text-rose-400"></i> Live Market Sync
+                    </h4>
+                    <div id="liveJobs" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <p class="text-slate-600 text-xs italic">Awaiting analysis to sync Adzuna index...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('analyzeForm');
+        const errorPopup = document.getElementById('errorPopup');
+        const errorText = document.getElementById('errorText');
+
+        const showError = (msg) => {
+            errorText.textContent = msg;
+            errorPopup.classList.add('show');
+            setTimeout(hideError, 8000);
+        };
+
+        const hideError = () => {
+            errorPopup.classList.remove('show');
+        };
+
+        const fileInput = document.getElementById('resume_file');
+        const fileStatus = document.getElementById('fileStatus');
+        const fileIcon = document.getElementById('fileIcon');
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                fileStatus.innerHTML = `Selected: <span class="text-sky-400">${fileName}</span>`;
+                fileIcon.innerHTML = `<i class="fas fa-file-pdf text-4xl text-sky-400"></i>`;
+            } else {
+                fileStatus.innerHTML = `Drop Resume or <span class="text-sky-400">Browse</span>`;
+                fileIcon.innerHTML = `<i class="fas fa-cloud-upload-alt text-4xl text-slate-800"></i>`;
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('spinner');
+            const bolt = document.querySelector('.spinner-hide');
+            const results = document.getElementById('results');
+            const heroSection = document.getElementById('heroSection');
+
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+            bolt.classList.add('hidden');
+
+            const formData = new FormData(form);
+            try {
+                const response = await fetch('/api/analyze-resume/', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (!response.ok) throw new Error(data.details || data.error || 'Intelligence engine failure');
+
+                // Shift UI
+                heroSection.classList.add('mb-8');
+                results.classList.remove('hidden');
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Update Metrics
+                document.getElementById('matchScore').textContent = Math.round(data.match_percentage) + '%';
+                document.getElementById('matchBar').style.width = data.match_percentage + '%';
+                document.getElementById('confScore').textContent = data.confidence_score.toFixed(2);
+                document.getElementById('readinessScore').textContent = Math.round(data.readiness_score) + '%';
+                document.getElementById('profileVersion').textContent = data.role_profile_version || '1';
+
+                // Update Skills
+                document.getElementById('matchedSkills').innerHTML = data.matched_skills.map(s => 
+                    `<span class="px-4 py-1.5 bg-sky-500/5 text-sky-400 rounded-xl text-[10px] font-black uppercase tracking-tight border border-sky-500/10 hover:bg-sky-500/10 transition cursor-default">${s}</span>`
+                ).join('');
+
+                document.getElementById('missingSkills').innerHTML = data.missing_skills.map(s => 
+                    `<span class="px-4 py-1.5 bg-rose-500/5 text-rose-400 rounded-xl text-[10px] font-black uppercase tracking-tight border border-rose-500/10 hover:bg-rose-500/10 transition cursor-default">${s}</span>`
+                ).join('');
+
+                // Update Roadmap
+                document.getElementById('shortTerm').innerHTML = data.roadmap.short_term.map(i => `<li class="flex items-start"><i class="fas fa-angle-right mr-3 text-sky-500 mt-1"></i>${i}</li>`).join('');
+                document.getElementById('longTerm').innerHTML = data.roadmap.long_term.map(i => `<li class="flex items-start"><i class="fas fa-angle-right mr-3 text-purple-500 mt-1"></i>${i}</li>`).join('');
+
+                // Update Dashboard
+                if (data.dashboard_summary) {
+                    document.getElementById('executiveSummary').textContent = data.dashboard_summary.executive_summary;
+                    document.getElementById('salaryInsight').textContent = data.dashboard_summary.salary_insight;
+                    document.getElementById('topRoles').innerHTML = data.dashboard_summary.top_roles.map(r => 
+                        `<span class="px-4 py-2 bg-emerald-500/5 text-emerald-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-500/10">${r}</span>`
+                    ).join('');
+                    document.getElementById('growthRoadmap').innerHTML = data.dashboard_summary.growth_roadmap.map(s => 
+                        `<li class="text-xs text-slate-400 flex items-start bg-white/5 p-3 rounded-xl border border-white/5 shadow-sm"><i class="fas fa-check-circle text-emerald-500 mr-3 mt-0.5"></i>${s}</li>`
+                    ).join('');
+                }
+
+                // Update Jobs
+                if (data.live_jobs && data.live_jobs.length > 0) {
+                    document.getElementById('liveJobs').innerHTML = data.live_jobs.map(j => `
+                        <div class="p-6 bg-slate-950/40 rounded-3xl border border-white/5 hover:border-sky-500/30 transition-all duration-300 group">
+                            <div class="flex justify-between items-start mb-4">
+                                <h5 class="text-sm font-black text-slate-200 group-hover:text-sky-400 transition leading-tight">${j.title}</h5>
+                                <a href="${j.redirect_url}" target="_blank" class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-slate-500 hover:text-white transition hover:bg-sky-500/20">
+                                    <i class="fas fa-external-link-alt text-[10px]"></i>
+                                </a>
+                            </div>
+                            <div class="flex flex-wrap gap-4 mb-4">
+                                <span class="text-[9px] text-slate-500 font-bold uppercase"><i class="fas fa-building mr-2 text-sky-500"></i>${j.company}</span>
+                                <span class="text-[9px] text-slate-500 font-bold uppercase"><i class="fas fa-map-marker-alt mr-2 text-rose-500"></i>${j.location}</span>
+                            </div>
+                            <p class="text-[10px] text-emerald-400 font-black mb-4 uppercase tracking-widest">
+                                <i class="fas fa-wallet mr-2"></i> ${j.salary_min ? '₹' + j.salary_min.toLocaleString() : 'Competitive'}
+                            </p>
+                            <p class="text-xs text-slate-500 leading-relaxed line-clamp-2 font-light">${j.description}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('liveJobs').innerHTML = '<p class="text-slate-600 text-sm italic py-10 text-center">No live market matches detected for this Role/Location.</p>';
+                }
+
+            } catch (err) {
+                console.error('Processing Error:', err);
+                showError(err.message);
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('hidden');
+                bolt.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

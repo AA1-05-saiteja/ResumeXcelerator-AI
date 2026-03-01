@@ -1,0 +1,7 @@
+django>=5.0
+djangorestframework
+PyMuPDF
+openai
+python-dotenv
+jsonschema
+requests
