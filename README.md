@@ -14,7 +14,7 @@ Skills they need to upgrade
 
 A clear roadmap to become job-ready
 
-🎯 Key Features
+**🎯 Key Features**
 
 📄 Resume Upload and Analysis
 
@@ -28,7 +28,7 @@ A clear roadmap to become job-ready
 
 🛣 Personalized Career Roadmap
 
-🧠 Technologies Used
+**🧠 Technologies Used**
 
 Python
 
@@ -42,7 +42,7 @@ NLP (NLTK / SpaCy)
 
 MySQL / MongoDB
 
-⚙️ How It Works
+**⚙️ How It Works**
 
 User uploads a resume.
 
@@ -56,7 +56,7 @@ Missing skills and recommendations are generated.
 
 A career roadmap is provided to the user.
 
-🌍 Sustainable Development Goal (SDG)
+**🌍 Sustainable Development Goal (SDG)**
 
 This project supports:
 
@@ -64,7 +64,7 @@ SDG 8 – Decent Work and Economic Growth
 
 It helps improve employability and guides individuals toward better career opportunities.
 
-📌 Future Enhancements
+**📌 Future Enhancements**
 
 Integration with job portals
 
@@ -74,9 +74,14 @@ Real-time skill demand analysis
 
 Personalized learning recommendations
 
-👥 Team
+**👥 Team**
 
 Team Name: ResumeXcelerate_AI
+We are a student innovation team focused on building AI-driven solutions that bridge the gap between candidate skills and industry expectations.
+
+**📜 License**
+
+This project is developed for educational and research purposes.
 
 We are a student innovation team focused on building AI-driven solutions that bridge the gap between candidate skills and industry expectations.
 
