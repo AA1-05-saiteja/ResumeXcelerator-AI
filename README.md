@@ -82,9 +82,3 @@ We are a student innovation team focused on building AI-driven solutions that br
 **📜 License**
 
 This project is developed for educational and research purposes.
-
-We are a student innovation team focused on building AI-driven solutions that bridge the gap between candidate skills and industry expectations.
-
-📜 License
-
-This project is developed for educational and research purposes.
